@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 스타일 시트 -->
+    <style>
+        .div_base {
+            display: inline-block;
+        }
+        #title_div {
+            border: 1px solid black;
+            width: 913px;
+            height: 40px;
+            color: white;
+            font-size: x-large;
+            text-align: center;
+            background-color: darkblue;
+        }
+        .div_with_whole_width {
+            border: 1px solid black;
+            width: 913px;
+            height: 50px;
+        }
+        .human_img {
+            border: 1px solid black;
+            width: 300px;
+            height: 300px;
+        }
+        .computer_img {
+            border: 1px solid black;
+            width: 300px;
+            height: 300px;
+        }
+        .status {
+            width: 300px;
+            height: 30px;
+            border: 1px solid black;
+            font-size: large;
+            color: white;
+            text-align: center;
+        }
+        .title_img {
+            width: 300px;
+            background: antiquewhite;
+            vertical-align: middle;
+            text-align: center;
+            display: table-cell;
+        }
+        #result_div {
+            color: blue;
+            font-size: xx-large;
+            text-align: center;
+        }
+        #timer_div {
+            color: red;
+            font-size: xx-large;
+            text-align: center;
+        }
+    </style>
+    <!-- 스타일 시트 -->
+</head>
+
+<body>
+
+<!-- 타이틀  [1] -->
+<div id="title_div">
+    2016학년도 1학기 JAVASCRIPT 기말고사(가위바위보 게임) (C)정영철 교수
+</div>
+
+<!-- 사용자 입력 이미지 [2] -->
+<div>
+    <div>가위 바위 보 중 하나를 고르세요~~</div>
+    <div>
+        <!-- 사용자 선택: 가위 -->
+        <img id="input_img_scissors" src="human_scissors.gif" width="100px" height="100px"
+             onclick="test.makeTurn('scissors')">
+
+        <!-- 사용자 선택: 바위 -->
+        <img id="input_img_rock" src="human_rock.gif" width="100px" height="100px"
+             onclick="test.makeTurn('rock')">
+
+        <!-- 사용자 선택: 보 -->
+        <img id="input_img_paper" src="human_paper.gif" width="100px" height="100px"
+             onclick="test.makeTurn('paper')">
+
+        <!-- 타이머 스타트 -->
+        <img src="gamestart.jpg" width="150px" height="80px"
+             onclick="test.startGame()" style="margin-left: 300px;">
+
+        <!-- 타이머 종료 -->
+        <img src="finishgame.jpg" width="150px" height="80px"
+             onclick="test.stopGame()">
+    </div>
+</div>
+
+<!-- 사용자 : 선택된 "가위 바위 보" 이미지 [3] -->
+<div id="human" class="div_base">
+    <div id="human_status" class="status"></div>
+    <div class="title_img">Human</div>
+    <div id="human_img" class="human_img"></div>
+</div>
+
+<!-- VS 이미지 [4] -->
+<div class="div_base"><img src="vs.gif"></div>
+
+<!-- 컴퓨터 : 선택된 "가위 바위 보" 이미지 [5] -->
+<div id="computer" class="div_base">
+    <div id="computer_status" class="status"></div>
+    <div class="title_img">Computer</div>
+    <div id="computer_img" class="computer_img"></div>
+</div>
+
+<!-- 결과 화면 [6] -->
+<div id="result_div" class="div_with_whole_width">
+</div>
+
+<!-- Timer [7]-->
+<div id="timer_div" class="div_with_whole_width"></div>
+
+<script>
+    function RockPaperScissors(argType, argIsComputer) {
+        this.typeOfRps=argType; //가위바위보 문자를 담는 변수
+        this.img_obj=document.createElement("img");// img element를 만들어 담는 변수
+
+        if(argIsComputer==false){
+            this.img_obj.src="human_"+this.typeOfRps+".gif"; // player가 사람이면 사람전용의 이미지를 담는다
+        }
+        else if(argIsComputer==true){
+            this.img_obj.src="computer_"+this.typeOfRps+".gif"; // 컴퓨터일 경우 컴퓨터정용의 이미지를 담는다
+        }
+
+        this.valueOf = function(){
+            return this.typeOfRps;// 객체를 비교한다면 무엇을 냈는지 불러온다
+        }
+    }
+
+    function Player(argIsComputer) {
+        this.rockPaeprScissors = new Array(); //각각의 이미지 객체를 담는 배열
+
+        var winCount=0;//승리했을 경우
+        var loseCount=0;//졌을 경우
+        var drawCount=0;//비겼을 경우
+        this.currentRSPValue;//가위바위보 이미지를 담는 프로퍼티
+
+        //각각의 이미지를 배열에 넣음
+        this.rockPaeprScissors.push(new RockPaperScissors('rock',argIsComputer));
+        this.rockPaeprScissors.push(new RockPaperScissors('paper',argIsComputer));
+        this.rockPaeprScissors.push(new RockPaperScissors('scissors',argIsComputer));
+
+        this.increaseWinCount = function(){
+            winCount++;//private로 승리경우 증가
+        };
+        this.increaseLoseCount = function(){
+            loseCount++;//private로 진 경우 증가
+        };
+        this.increaseDrawCount = function(){
+            drawCount++;//private로 비겼을 경우 증가
+        };
+        this.getWinCount = function(){
+            return winCount;//이긴 경우의 수를 가져옴
+        };
+        this.getLoseCount = function(){
+            return loseCount;//진 경우의 수를 가져옴
+        };
+        this.getDrawCount = function(){
+            return drawCount;// 비긴 경우의 수를 가져옴
+        };
+        this.setToZeroForWinLoseDrawCount = function(){
+            //모든 수를 초기화
+            winCount=0;
+            loseCount=0;
+            drawCount=0;
+        };
+        this.getRPS = function(){
+            this.Temp = parseInt(Math.random()*3);
+            //컴퓨터의 이미지를 랜덤으로 가져오기 위해 랜덤함수를 사용
+
+            //이미지를 저장하는 변수에 현재 선택된 이미지를 배열에서 가져와서 넣음
+            this.currentRSPValue = this.rockPaeprScissors[this.Temp];
+
+            //이 메서드를 불러올 때 이미지를 가지고 있는 객체 반환
+            return this.currentRSPValue;
+        };
+        this.setRPS = function(argRPS){
+            this.Temp;//배열에 있는 것을 구분해서 가져오기 위한 변수
+            if(argRPS=='rock'){
+                this.Temp=0;//바위인 경우
+            }
+            else if(argRPS=='paper'){
+                this.Temp=1;//보인 경우
+            }
+            else if(argRPS=='scissors'){
+                this.Temp=2;// 가위인 경우
+            }
+
+            //현재 선택한 값을 이미지를 저장하기 위한 변수에 넣음
+            this.currentRSPValue = this.rockPaeprScissors[this.Temp];
+
+            //이 메서드를 실행할 경우 이미지를 가진 객체 반환
+            return this.currentRSPValue;
+        }
+
+    }
+
+    function RPSGame() {
+        //플레이어 두명의 객체를 생성
+        this.playerHuman = new Player(false);
+        this.playerComputer = new Player(true);
+        //타이머를 넣는 구간의 div id를 넣는 변수
+        var timer_div_obj = document.getElementById("timer_div");
+        // 타이머 객체 생성
+        this.rpsTimer = new timer(timer_div_obj);
+
+        this.status_bar_update = function(argStatus , argIsComputer, argObj){
+            //플레이어가 사람일 경우
+            if(argIsComputer==false){
+                //이겼을 경우
+                if(argStatus=='win'){
+                    //bar의 백그라운드 색을 파랑으로 변경
+                    argObj.style.backgroundColor="blue";
+                }
+                //졌을 경우
+                else if(argStatus=='lose'){
+                    //bar의 백그라운드 색을 빨강으로 변경
+                    argObj.style.backgroundColor="red";
+                }
+                else{
+                    //비겼을 경우 bar의 백그라운드 색을 검정으로 변경
+                    argObj.style.backgroundColor="black";
+                }
+                //승무패를 출력한다, getcount를 가져와서 private로 만든 값을 가져옴
+                argObj.innerHTML=this.playerHuman.getWinCount()+"승"+
+                                  this.playerHuman.getDrawCount()+"무"+
+                                  this.playerHuman.getLoseCount()+"패";
+            }
+            else{
+                //플레이어가 컴퓨터인 경우 위와 동일하게 진행
+                if(argStatus=='win'){
+                    argObj.style.backgroundColor="blue";
+                }
+                else if(argStatus=='lose'){
+                    argObj.style.backgroundColor="red";
+                }
+                else{
+                    argObj.style.backgroundColor="black";
+                }
+                argObj.innerHTML=this.playerComputer.getWinCount()+"승"+
+                        this.playerComputer.getDrawCount()+"무"+
+                        this.playerComputer.getLoseCount()+"패";
+            }
+        };
+        this.startGame = function (){
+            //게임 시작시 플레이어 두명의 전적을 초기화해준다.
+            this.playerComputer.setToZeroForWinLoseDrawCount();
+            this.playerHuman.setToZeroForWinLoseDrawCount();
+            //타이머를 실행한다
+            this.rpsTimer.startTimer();
+        };
+        this.stopGame = function(){
+            //타이머를 종료한다
+            this.rpsTimer.stopTimer();
+        };
+        this.makeTurn = function(argRpsOfHuman){
+            //플레이어 각각의 div 공간을 가져온다(이미지를 출력하는 공간, 현재 경기상황을 표시하는 공간, 승무패를 표시하는 공간)
+            var Human_div = document.getElementById("human_img");
+            var Computer_div = document.getElementById("computer_img");
+            var result_div = document.getElementById("result_div");
+            var Human_Status_div = document.getElementById("human_status");
+            var Computer_Status_div = document.getElementById("computer_status");
+            //플레이어 각각의 이미지를 가져오기 위해 메서드를 실행한다.
+            var Human_img = this.playerHuman.setRPS(argRpsOfHuman);
+            var Computer_img = this.playerComputer.getRPS();
+
+
+            //만약 플레이어 각각의 div 공간에 이미지가 있을 경우 그것을 지우고 이미지를 넣는다.
+            if(Human_div.firstElementChild!=null)
+                Human_div.removeChild(Human_div.firstElementChild);
+            Human_div.appendChild(Human_img.img_obj);
+
+            if(Computer_div.firstElementChild!=null)
+                Computer_div.removeChild(Computer_div.firstElementChild);
+            Computer_div.appendChild(Computer_img.img_obj);
+
+            //비겼을 경우 이겼을 경우, 졌을 경우에 현재 경기 상황을 표시해준다.
+            if(this.playerComputer.currentRSPValue=='rock'&&this.playerHuman.currentRSPValue=='rock'||
+                    this.playerComputer.currentRSPValue=='scissors'&&this.playerHuman.currentRSPValue=='scissors'||
+                    this.playerComputer.currentRSPValue=='paper'&&this.playerHuman.currentRSPValue=='paper'){
+                result_div.innerHTML="Draw";
+                //그리고 각각의 플레이어의 이긴 경우, 진경우를 표시한다.
+                this.playerComputer.increaseDrawCount();
+                this.playerHuman.increaseDrawCount();
+                //전적판을 업데이트해준다.
+                this.status_bar_update('draw',true, Computer_Status_div);
+                this.status_bar_update('draw',false, Human_Status_div);
+            }
+            else if(this.playerComputer.currentRSPValue=='rock'&&this.playerHuman.currentRSPValue=='paper'||
+                    this.playerComputer.currentRSPValue=='scissors'&&this.playerHuman.currentRSPValue=='rock'||
+                    this.playerComputer.currentRSPValue=='paper'&&this.playerHuman.currentRSPValue=='scissors'){
+                result_div.innerHTML="Win";
+                this.playerComputer.increaseLoseCount();
+                this.playerHuman.increaseWinCount();
+                this.status_bar_update('lose',true, Computer_Status_div);
+                this.status_bar_update('win',false, Human_Status_div);
+            }
+            else if(this.playerComputer.currentRSPValue=='rock'&&this.playerHuman.currentRSPValue=='scissors'||
+                    this.playerComputer.currentRSPValue=='scissors'&&this.playerHuman.currentRSPValue=='paper'||
+                    this.playerComputer.currentRSPValue=='paper'&&this.playerHuman.currentRSPValue=='rock'){
+                result_div.innerHTML="Lose";
+                this.playerComputer.increaseWinCount();
+                this.playerHuman.increaseLoseCount();
+                this.status_bar_update('win',true, Computer_Status_div);
+                this.status_bar_update('lose',false, Human_Status_div);
+            }
+        }
+    }
+    var id; // setinterval을 사용할 때 끄는 기능도 필요하기에 id를 부여해준다.
+    var clock=0; // 버튼을 여러번 누를 경우 계속 실행되는 것을 방지하기 위해 조건을 걸어주는 변수
+    function timer(argDivObj) {
+        //div의 id를 받아와 변수에 넣음
+        var i=0;//시간을 나타낼 변수
+        this.startTimer = function(){
+            clock++;//조건 부여
+            if(clock==1) {
+                //시간을 나타내는 타이머 1초마다 실행된다.
+                id = setInterval(update, 1000);
+            }
+        };
+        this.stopTimer = function(){
+            //타이머를 끈다. 실행되고 잇던 setinterval을 꺼주고 조건을 처음으로 돌린다.
+            clearInterval(id);
+            clock=0;//조건을 초기화 시켜줌으로써 종료 후 다시 시작할 때 seinterval을 실행시킴
+            i=0;//초기화 시켜줌으로써 재 시작시 1초부터 다시 시작
+        };
+        function update(){
+            i++;//나타내는 시간
+            argDivObj.innerHTML=Math.floor(i/3600)+" : "+
+                                Math.floor(i%3600/60)+" : "+
+                                Math.floor(i%3600%60);
+        }
+    }
+    var test = new RPSGame();
+
+/*    제가 제출한 걸 다시 잘 살펴보고 무엇이 문제인지 생각해보았습니다.
+    처음 제출하였을 때의 문제가 이미지 출력이 되지 않음 + 비교결과값이 이상하게 나옴 + 전적판 출력 안됨
+    이렇게 세가지였습니다. 다시 살펴보니 이미지 출력이 되지 않음의 문제는 appendChild에 이미지 객체를 넣어야 하는데
+    아무것도 리턴되지 않는 객체만 집어 넣었기 때문에 생긴 일이였습니다. 객체 안에 있는 이미지 객체를 넣으니 해결되었습니다.
+    (그리고 컴퓨터 div에 실수로 사람 이미지를 같이 넣어버렸던 것도 있었습니다.)
+    비교결과값이 이상하게 나오는 문제는 if문에 적은 비교식에 문제가 있었습니다.
+    객체 안에서 리턴되는 값(currentRSPValue)을 가져오면 된다는 생각에 객체를 그대로 가져왔더니 객체 안에서
+    값이 새로 생성된다는 걸 잊고 있었던 문제였습니다. 이것을 해결하니 제대로 실행 되었습니다.
+    전적판 출력 안됨 현상은 div id를 매개변수로 가져올 때 큰따옴표를 적었습니다. 지웠더니 제대로 해결 되었습니다.
+    다시 공부할 수 있는 계기가 되었고 앞으로 다양한 실습을 할 수 있는 계기가 되었습니다.
+    이번 학기 감사드립니다. 좋은 하루 보내시길 바랍니다.       */
+</script>
+
+</body>
+</html>
